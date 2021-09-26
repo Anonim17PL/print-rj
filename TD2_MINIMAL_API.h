@@ -1,42 +1,32 @@
 
 
-#ifndef TD2_MINIMAL_API_h
-    #define TD2_MINIMAL_API_h
+#pragma once
         #include "json.hpp"
         using namespace std; using json = nlohmann::json;
+
         void loadTimetable(const json TTData, json& trainInfoVar, json& stopPointsVar) {
             trainInfoVar = TTData["trainInfo"];
             stopPointsVar = TTData["stopPoints"];
         }
-        int buildArray(const json TInfo, const json RJ, const json localdb, string PointName[], bool pointNameisBold[], string ArrivalTimeWString[], string DepartureTimeWString[], int ArrivalDelay[], int DepartureDelay[], int DepartureLineTracks[], int &MaxStations, string &TrainString, string &TrainRouteString, double pointDistance[], string PointCodes[]){
-            /* Out of date
-            [0][x]:
-                    0: Rodzaj i numer poci¹gu
-                    1: Relacja
-            [?][x]:
-                    0: Punkt stacyjny
-                    1: Czy nazwa punktu stacyjnego powinna byæ pogrubiona? (0/1) (wykrywanie ci¹gu '<strong>')
-                    2: Godznia przyjazdu
-                    3: Godznia odjazdu
-                    4: Czas postoju
-                    5: Godznia przyjazdu w minutach, u¿ywana do obliczenia czasu przejazdu
-                    6: Czas przejazdu
-                    7: Iloœæ torów na szlaku wyjazdowym (1/2)
-            */
-
-            
+        int buildArray(const json TInfo, const json RJ, const json localdb, string PointName[], bool pointNameisBold[], string ArrivalTimeWString[], string DepartureTimeWString[], int ArrivalDelay[], int DepartureDelay[], int DepartureLineTracks[], int &MaxStations, string &TrainString, string &TrainRouteString, double pointDistance[], string PointCodes[], bool skipSBL){  
             TrainString = TInfo.value("trainCategoryCode", "") + to_string(TInfo.value("trainNo", 0));
-            
             TrainRouteString = TInfo.value("route", "");
-            int hhprev=0, mmprev=0;
+            int hhprev=0, mmprev=0, offset=0, nextday=0;
             unsigned int i = 0;
             int breakloop = 0;
             while (breakloop == 0) {
                 string NameRAW = RJ[i].value("pointNameRAW", "");
-                PointName[i] = NameRAW;
-                if (string::npos != RJ[i].value("pointName", "").find("<strong>")) { pointNameisBold[i] = 1; }
-                else { pointNameisBold[i] = 0; }
-                int hh, mm, ss;
+                if (skipSBL==true) {
+                    while (NameRAW.substr(0, 3) == "SBL" || NameRAW.substr(0, 3) == "sbl") {
+                        i++;
+                        offset--;
+                        NameRAW = RJ[i].value("pointNameRAW", "");
+                    }
+                }
+                PointName[i+offset] = NameRAW;
+                if (string::npos != RJ[i].value("pointName", "").find("<strong>")) { pointNameisBold[i + offset] = 1; }
+                else { pointNameisBold[i + offset] = 0; }
+                int hh, mm, ss, timeam=0, timedm=0;
                 if (RJ[i]["arrivalTime"].is_null() == false) {
                     string Arrival = RJ[i].value("arrivalTime", "");
                     string ArrivalTime = Arrival.substr(Arrival.find("T") + 1, Arrival.find("Z") - 1 - Arrival.find("T"));
@@ -44,7 +34,8 @@
                     mm = stoi(ArrivalTime.substr(3, 2));
                     ss = stoi(ArrivalTime.substr(6, 2));
                     hh = hh + 2;
-
+                    if (hh >= 24) hh = hh - 24;
+                    timeam = hh * 60 + mm;
                     string smm;
                     string shh;
 
@@ -54,19 +45,21 @@
                     if (mm < 10) smm = ("0" + to_string(mm));
                     else smm = to_string(mm);
 
-                    ArrivalTimeWString[i] = (shh + ":" + smm); //Godznia przyjazdu
-                    ArrivalDelay[i] = (hh * 60 + mm) - (hhprev * 60 + mmprev); //czas postoju
+                    ArrivalTimeWString[i + offset] = (shh + ":" + smm); //Godznia przyjazdu
+                    int arrdel = timeam - mmprev;
+                    if (arrdel < 0) arrdel = arrdel + 1440;
+                    ArrivalDelay[i + offset] = arrdel; //czas postoju
                 }
                 else {
-                    ArrivalTimeWString[i] = "-----";
-                    ArrivalDelay[i] = 0;
+                    ArrivalTimeWString[i + offset] = "-----";
+                    ArrivalDelay[i + offset] = 0;
                     hh = 0;
                     mm = 0;
                     ss = 0;
                 }
 
                 int Dhh, Dmm, Dss;
-                
+                //MessageBox(NULL, (LPCWSTR)L"dep in", (LPCWSTR)L"DEBUG", 0x00000000L);
                 if (RJ[i]["departureTime"].is_null() == false) {
                     string Dep = RJ[i].value("departureTime", "");
                     string DepTime = Dep.substr(Dep.find("T") + 1, Dep.find("Z") - 1 - Dep.find("T"));
@@ -74,26 +67,27 @@
                     Dmm = stoi(DepTime.substr(3, 2));
                     Dss = stoi(DepTime.substr(6, 2));
                     Dhh = Dhh + 2;
-
                     string smm;
                     string shh;
-
+                    if (Dhh >= 24) Dhh = Dhh - 24;
+                    int timedm = Dhh * 60 + Dmm;
                     if (Dhh < 10) shh = ("0" + to_string(Dhh));
                     else shh = to_string(Dhh);
 
                     if (Dmm < 10) smm = ("0" + to_string(Dmm));
                     else smm = to_string(Dmm);
 
-                    DepartureTimeWString[i] = (shh + ":" + smm);
-                    hhprev = Dhh;
-                    mmprev = Dmm;
+                    DepartureTimeWString[i + offset] = (shh + ":" + smm);
+                    mmprev = timedm;
+                    int depdel = timedm - timeam;
+                    if (depdel < 0) depdel = depdel + 1440;
                     if (i!=0) {
-                        DepartureDelay[i] = (Dhh * 60 + Dmm) - (hh * 60 + mm); //czas postoju
-                    } else DepartureDelay[i] = 0;
+                        DepartureDelay[i + offset] = depdel; //czas postoju
+                    } else DepartureDelay[i + offset] = 0;
                 }
                 else {
-                    DepartureTimeWString[i] = "-----";
-                    DepartureDelay[i] = 0;
+                    DepartureTimeWString[i + offset] = "-----";
+                    DepartureDelay[i + offset] = 0;
                     Dhh = 0;
                     Dmm = 0;
                     Dss = 0;
@@ -104,11 +98,10 @@
                 //if (i > 0) { ArrivalDelay[i] = DelayArray[i] - (hh * 60 + mm); } else { ArrivalDelay[i] = -1; } // Czas przejazdu
                 //RJArray[j][7] = RJ[i]["arrivalLine"].get <wstring>();
                 //DepartureLineTracks[i] = localdb[NameRAW].value("departureLine", "");
-                DepartureLineTracks[i] = 2;
-                pointDistance[i] = RJ[i].value("pointDistance", DBL_MAX);
-                PointCodes[i] = RJ[i].value("pointStopType", "");
+                DepartureLineTracks[i + offset] = 2;
+                pointDistance[i + offset] = RJ[i].value("pointDistance", DBL_MAX);
+                PointCodes[i + offset] = RJ[i].value("pointStopType", "");
                 i = i + 1;
             }
-            return i-1;
+            return i-1 + offset;
         }
-#endif
