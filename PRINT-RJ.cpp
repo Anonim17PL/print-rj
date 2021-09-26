@@ -109,7 +109,7 @@ std::wstring PL(wstring text)
     text = ReplaceAll(text, L"Ż", L"\xbd");
     text = ReplaceAll(text, L"Ź", L"\x8d");
 
-    text = ReplaceAll(text, L"|", L"-");
+    text = ReplaceAll(text, L"|", L" - ");
     return text;
 }
 
@@ -126,15 +126,28 @@ wstring header = (
 
 wstring footer = L"\xc0\xc4\xc4\xc4\xc4\xc4\xc1\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc1\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc1\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc1\xc4\xc4\xc4\xc4\xc4\xc4\xc1\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc1\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xd9\x0c";
 
-wstring bodygenerator(wstring Fstring[]) {
-    wstring body = (
-        wstring(L"\xc3\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xb4\n") +
-        wstring(L"\xb3     \xb3                                \xb3         \xb3         \xb3" + wstring(Fstring[3]) + L"\xb3        \xb3        \xb3\n") +
-        wstring(L"\xb3 ___ \xb3" + wstring(Fstring[0]) + L"\xb3" + wstring(Fstring[1]) + L"\xb3" + wstring(Fstring[2]) + L"\xc3\xc4\xc4\xc4\xc4\xc4\xc4\xb4" + wstring(Fstring[4]) + L"\xb3" + wstring(Fstring[5]) + L"\xb3\n") +
-        wstring(L"\xb3     \xb3                                \xb3         \xb3         \xb3" + wstring(Fstring[7]) + L"\xc3\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xb4\n") +
-        wstring(L"\xb3     \xb3                                \xb3" + wstring(Fstring[9]) + L"\xb3" + Fstring[10] + L"\xc3\xc4\xc4\xc4\xc4\xc4\xc4\xb4        \xb3        \xb3\n") +
-        wstring(L"\xb3     \xb3" + wstring(Fstring[8]) + L"\xb3         \xb3         \xb3" + wstring(Fstring[11]) + L"\xb3" + wstring(Fstring[12]) + L"\xb3        \xb3\n")
-        );
+wstring bodygenerator(wstring Fstring[], int nonfirstbody) {
+    wstring body;
+    if (nonfirstbody != 0) {
+        body = (
+            wstring(L"\xc3\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xb4\n") +
+            wstring(L"\xb3     \xb3                                \xb3         \xb3         \xb3" + wstring(Fstring[3]) + L"\xb3        \xb3        \xb3\n") +
+            wstring(L"\xb3 ___ \xb3" + wstring(Fstring[0]) + L"\xb3" + wstring(Fstring[1]) + L"\xb3" + wstring(Fstring[2]) + L"\xc3\xc4\xc4\xc4\xc4\xc4\xc4\xb4" + wstring(Fstring[4]) + L"\xb3" + wstring(Fstring[5]) + L"\xb3\n") +
+            wstring(L"\xb3     \xb3                                \xb3         \xb3         \xb3" + wstring(Fstring[7]) + L"\xc3\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xb4\n") +
+            wstring(L"\xb3     \xb3                                \xb3" + wstring(Fstring[9]) + L"\xb3" + Fstring[10] + L"\xc3\xc4\xc4\xc4\xc4\xc4\xc4\xb4        \xb3        \xb3\n") +
+            wstring(L"\xb3     \xb3" + wstring(Fstring[8]) + L"\xb3         \xb3         \xb3" + wstring(Fstring[11]) + L"\xb3" + wstring(Fstring[12]) + L"\xb3        \xb3\n")
+            );
+    }
+    else {
+        body = (
+            wstring(L"\xc3\xc4\xc4\xc1\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc2\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xb4\n") +
+            wstring(L"\xb3     \xb3                                \xb3         \xb3         \xb3" + wstring(Fstring[3]) + L"\xb3        \xb3        \xb3\n") +
+            wstring(L"\xb3 ___ \xb3" + wstring(Fstring[0]) + L"\xb3" + wstring(Fstring[1]) + L"\xb3" + wstring(Fstring[2]) + L"\xc3\xc4\xc4\xc4\xc4\xc4\xc4\xb4" + wstring(Fstring[4]) + L"\xb3" + wstring(Fstring[5]) + L"\xb3\n") +
+            wstring(L"\xb3     \xb3                                \xb3         \xb3         \xb3" + wstring(Fstring[7]) + L"\xc3\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc5\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xc4\xb4\n") +
+            wstring(L"\xb3     \xb3                                \xb3" + wstring(Fstring[9]) + L"\xb3" + Fstring[10] + L"\xc3\xc4\xc4\xc4\xc4\xc4\xc4\xb4        \xb3        \xb3\n") +
+            wstring(L"\xb3     \xb3" + wstring(Fstring[8]) + L"\xb3         \xb3         \xb3" + wstring(Fstring[11]) + L"\xb3" + wstring(Fstring[12]) + L"\xb3        \xb3\n")
+            );
+    };
 
     return body;
 }
@@ -156,6 +169,18 @@ wstring centerstring(wstring ws,int size)
     return output;
 }
 
+wstring toleftstring(wstring ws, int size)
+{
+    wstring output;
+    const wchar_t* s = ws.c_str();
+    int l = wcslen(s);
+    int add = size - l;
+    output += s;
+    for (int i = 0; i < (int)add; i++)
+        output += L" ";
+    return output;
+}
+
 int bodyWStringArrayGenerator(const wstring stationName, const bool stationNameBolded, const wstring Number, const wstring Locomotive1, const wstring Locomotive2, const wstring Locomotive3, const wstring brutto, const wstring trainlength, const wstring Vmax, const wstring distance, const wstring TimeArr, const wstring TimeDep, const wstring ArrDel, const wstring DepDel, const wstring StationInfo, wstring returndata[]) {
     //wstring data[12];
     //string data[12];
@@ -167,7 +192,7 @@ int bodyWStringArrayGenerator(const wstring stationName, const bool stationNameB
     else {
         //data[0] << SubSon << stationName << SubSoff;
     }
-    returndata[0] = centerstring(stationName,32);
+    returndata[0] = toleftstring(stationName,32);
     returndata[1] = centerstring(TimeArr,9);
     returndata[2] = centerstring(ArrDel,9);
     returndata[3] = centerstring(Locomotive1,6);
@@ -341,7 +366,10 @@ int main()
     json TInfo;
     //json localdb = load_db();
     json localdb;
-
+    json test;
+    //ifstream json_file("testRJ.json", std::ifstream::binary);
+    //json json_filevar;
+    //json_file >> json_filevar;
     string TrainNo;
     cout << "TRAIN NUMBER: ";
     cin >> TrainNo;
@@ -352,13 +380,14 @@ int main()
     string pointname[99], pointcodes[99], ArrTime[99], DepTime[99], Train, TRS;
     int ArrDel[99], DepDel[99], DepLT[99], MaxSt;
     loadTimetable(getTimetable(TrainNo), TInfo, RJ);
+    //loadTimetable(json_filevar["message"], TInfo, RJ);
     getTrainInfo(TrainNo,TrainData);
 
     wstring Locomotive1 = L"";
     wstring Locomotive2 = L"";
     wstring Locomotive3 = L"";
     wstring Vmax = L"";
-    int maxdata = buildArray(TInfo, RJ, localdb, pointname, pointnameBold, ArrTime, DepTime, ArrDel, DepDel, DepLT, MaxSt, Train, TRS, pointDistance, pointcodes);
+    int maxdata = buildArray(TInfo, RJ, localdb, pointname, pointnameBold, ArrTime, DepTime, ArrDel, DepDel, DepLT, MaxSt, Train, TRS, pointDistance, pointcodes, true);
     cout << endl << "LOK1:";
     wcin >> Locomotive1;
     cout << endl << "LOK2:";
@@ -372,12 +401,12 @@ int main()
     wstring outputdataF;
     wofstream printer("LPT1");
     //wofstream printer("test1.txt");
-    printer << L"\n \n \n" << utf8_decode(Train) << L"\n" << header;
+    printer << L"\n \n \n" << boldon << PL(utf8_decode(Train + " Relacja " + TRS)) << L"\n" << boldoff << header;
     for (int i=0; i<=maxdata; i++){
         cout << i;
         wstring returndata[99];
         bodyWStringArrayGenerator(utf8_decode(pointname[i]), pointnameBold[i], utf8_decode(Train), (Locomotive1), Locomotive2, (Locomotive3), utf8_decode(TrainData[1]), utf8_decode(TrainData[2]), (Vmax), to_wstring(pointDistance[i]), utf8_decode(ArrTime[i]), utf8_decode(DepTime[i]), to_wstring(ArrDel[i]), to_wstring(DepDel[i]), utf8_decode(pointcodes[i]), returndata);
-        wstring outputdata = bodygenerator(returndata);
+        wstring outputdata = bodygenerator(returndata,i);
         printer << outputdata;
         cout << " OK" << endl;
     }
