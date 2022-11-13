@@ -20,12 +20,12 @@
 */
 
 // Enable Double Height function (only Epson FX emulation)
-//#define DH_ON
+#define DH_ON
 
 // SELECT ONE!
 //#define IBM_PPR_EMULATION
 // OR
-//#define EPSON_FX_EMULATION
+#define EPSON_FX_EMULATION
 
 // DON'T USE!
 /*Retrieving information about sections between sceneries from the sceneryExtTrack.json.
@@ -47,6 +47,8 @@ The file must be updated on an ongoing basis so that the data is not disassemble
 
 using namespace std;
 using json = nlohmann::json;
+
+string portname = "LPT1";
 
 // Not used
 #ifdef DETECTION_DUAL_TRACK
@@ -342,7 +344,7 @@ json load_db() {
 
 
 void PrintHeader(wstring HeaderInfo, wstring TrainString) {
-    wofstream printer("LPT1");
+    wofstream printer(portname);
     printer << TrainString << L"\r\n";
     printer << HeaderInfo << L"\r\n" << L"\00";
 
@@ -350,17 +352,19 @@ void PrintHeader(wstring HeaderInfo, wstring TrainString) {
 };
 
 void PrintBody(wstring BodyInfo) {
-    wofstream printer("LPT1");
+    wofstream printer(portname);
     printer << BodyInfo << L"\r\n" << L"\00";
 };
 
 void PrintFooter() {
-    wofstream printer("LPT1");
+    wofstream printer(portname);
     printer << footer << L"\r\n" << L"\00";
 };
 
-int main()
+int main(int pn, char** ps)
 {
+    if (pn >= 2) portname = ps[1];
+    cout << "Print using port:" << portname << endl;
     cin;
     json RJ;
     json TInfo;
@@ -399,7 +403,7 @@ int main()
     cout << maxdata << endl;
 
     wstring outputdataF;
-    wofstream printer("LPT1");
+    wofstream printer(portname);
     //wofstream printer("test1.txt");
     printer << L"\n \n \n" << boldon << PL(utf8_decode(Train + " Relacja " + TRS)) << L"\n" << boldoff << header;
     for (int i=0; i<=maxdata; i++){

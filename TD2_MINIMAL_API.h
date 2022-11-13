@@ -33,7 +33,7 @@
                     hh = stoi(ArrivalTime.substr(0, 2));
                     mm = stoi(ArrivalTime.substr(3, 2));
                     ss = stoi(ArrivalTime.substr(6, 2));
-                    hh = hh + 2;
+                    hh = hh + 1;
                     if (hh >= 24) hh = hh - 24;
                     timeam = hh * 60 + mm;
                     string smm;
@@ -66,7 +66,7 @@
                     Dhh = stoi(DepTime.substr(0, 2));
                     Dmm = stoi(DepTime.substr(3, 2));
                     Dss = stoi(DepTime.substr(6, 2));
-                    Dhh = Dhh + 2;
+                    Dhh = Dhh + 1;
                     string smm;
                     string shh;
                     if (Dhh >= 24) Dhh = Dhh - 24;
